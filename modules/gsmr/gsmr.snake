@@ -2,25 +2,28 @@
 
 outf = config['--outfolder']
 sdir = sys.path[0] + '/scripts/'
-f1_s, f2_s = config['<sum1>'], config['<sum2>']
-f1i, f2i = f"{f1_s}.sumstats", f"{f2_s}.sumstats"
+f1i, f2i = config['<bzx>'], config['<bzy>']
+assert(f1i[-9:] == '.sumstats')
+assert(f2i[-9:] == '.sumstats')
+f1_s, f2s = f1i[:-9], f1i[:-9]
 f1 = f"{outf}/{f1_s}"
+threshold = config['--threshold']
+
 clumps = f"{f1}.clumped"
 merged_s = f"{outf}/merged"
 merged_sumstats = f"{merged_s}.sumstats"
 merged_allele = f"{merged_s}.allele"
 md_s = f"{outf}/md"
 md_matrix = f"{md_s}.xmat.gz"
-g1k = sys.path[0] + '/../../resources/g1000_eur'
-g1k_bim = sys.path[0] + '/../../resources/g1000_eur.bim'
-ld = "a"
+g1k = 'g1000_eur'
+g1k_bim = 'g1000_eur.bim'
+outstub = f"{outf}/results"
+outfile = f"{outf}/results.txt"
 
 
 rule all:
 	input:
-		#md_matrix
-		#merged_allele
-		ld
+		outfile
 
 rule clumping:
 	input:
@@ -53,21 +56,7 @@ rule ld:
 	input:
 		md_matrix, merged_sumstats
 	output:
-		ld
+		outfile
 	shell:
-		"Rscript {sdir}/ld.R {merged_sumstats} {md_matrix}"
-
-
-"""
-
-rule ld:
-	
-rule ld:
-	input:
-		f"{o}.xmat.gz"
-	output:
-		ld
-	shell:
-		"Rscript {pth}/ld.R {o}"
-"""
+		"Rscript {sdir}/analysis.R {merged_sumstats} {md_matrix} {threshold} {outstub}"
 

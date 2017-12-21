@@ -1,3 +1,18 @@
+library("gsmr")
+
+args = commandArgs(TRUE)
+
+statsfile = paste(args[1], sep='')
+ldfile = paste(args[2], sep='')
+gsmr_data = read.table(statsfile, header=T, stringsAsFactors=F)
+snp_coeff_id = scan(ldfile, what="", nlines=1)
+snp_coeff = read.table(ldfile, header=F, skip=2)
+snp_order = match(gsmr_data[,1], snp_coeff_id)
+snp_coeff_id = snp_coeff_id[snp_order]
+snp_coeff = snp_coeff[, snp_order]
+ldrho = cor(snp_coeff)
+colnames(ldrho) = rownames(ldrho) = snp_coeff_id
+
 snpfreq = gsmr_data$freq             # minor allele frequency of SNPs
 bzx = gsmr_data$bzx     # effects of instruments on risk factor
 bzx_se = gsmr_data$bzx_se       # standard errors of bzx
@@ -12,7 +27,7 @@ bzx_se = gsmr_data$std_bzx_se       # standard errors of bzx
 bzx_pval = gsmr_data$bzx_pval    # p-values for bzx
 bzy = gsmr_data$bzy     # SNP effects on disease
 bzy_se = gsmr_data$bzy_se       # standard errors of bzy
-gwas_thresh = 5e-8    # GWAS threshold to select SNPs as the instruments for the GSMR analysis
+gwas_thresh = 5e-5   # GWAS threshold to select SNPs as the instruments for the GSMR analysis
 heidi_thresh = 0.01    # HEIDI-outlier threshold
 filtered_index = heidi_outlier(bzx, bzx_se, bzx_pval, bzy, bzy_se, ldrho, snp_coeff_id, gwas_thresh, heidi_thresh) # perform HEIDI-outlier analysis
 filtered_gsmr_data = gsmr_data[filtered_index,]   # select data passed HEIDI-outlier filtering
@@ -28,10 +43,7 @@ filtered_ldrho = ldrho[filtered_gsmr_data$SNP,filtered_gsmr_data$SNP]  # LD corr
 gsmr_results = gsmr(bzx, bzx_se, bzx_pval, bzy, bzy_se, filtered_ldrho, filtered_snp_id)    # GSMR analysis 
 cat("Effect of exposure on outcome: ",gsmr_results$bxy)
 
-cat("Standard error of bxy: ",gsmr_results$bxy_se)
 
-cat("Standard error of bxy: ",gsmr_results$bxy_se)
 
-cat("Used index to GSMR analysis: ", gsmr_results$used_index[1:5], "...")
 
 

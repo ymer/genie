@@ -2,12 +2,15 @@
 
 '''
 usage:
- genie gsmr [options] <sum1> <sum2>
+ genie gsmr [options] <sum1> <sum2> <out>
 
 options:
- --out=PREFIX        Outname prefix [default: genie_gsmr]
  --nojob             if front end
- --dry-run            dry run
+ --dry-run           dry run
+ --threshold=T       GWAS threshold for inclusion [default: 5e-8]
+ <bzx>               bzx input file. (Must end in .sumstats)
+ <bzy>               bzy input file. (Must end in .sumstats)
+
 
 '''
 
