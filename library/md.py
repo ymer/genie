@@ -14,8 +14,12 @@ def main(args, methods):
     method = next(arg for arg in methods if arg in args and args[arg])
 
     args = process_arguments(args)
-    outfolder = f"genie_{method}/{args['--out']}"
-    pfix = f"{outfolder}/{args['--out']}"
+    if '--out' in args:
+        out = args['--out']
+    else:
+        out = args['<out>']
+    outfolder = f"genie_{method}/{out}"
+    pfix = f"{outfolder}/{out}"
 
     args[f"pfix_{method}"] = pfix
     args['--outfolder'] = outfolder
@@ -54,7 +58,7 @@ def main(args, methods):
     elif args['--nojob']:
         os.system(cmds)
     else:
-        run_job(debugdir, args['--out'], cmds)
+        run_job(debugdir, out, cmds)
 
 
 def process_arguments(args):
